@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - 45 Degrees Coffee</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            padding: 15px;
+            margin: 0;
+        }
+        .invoice-container {
+            max-width: 380px;
+            width: 100%;
+            background: #ffffff;
+            padding: 25px 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            color: #333;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+            overflow: hidden;
+        }
+        .header { text-align: center; margin-bottom: 15px; }
+        .header h2 { margin: 0 0 5px 0; font-size: 20px; font-weight: bold; }
+        .header p { margin: 0; font-size: 12px; color: #555; }
+        
+        .store-logo {
+            max-width: 100px;
+            height: auto;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        
+        .divider { border-top: 1px dashed #333; margin: 15px 0; }
+        
+        .info-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; gap: 5px; }
+        .info-row span { word-break: break-word; }
+        
+        .item-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px; margin-top: 10px; gap: 8px;}
+        .item-name { font-weight: bold; word-break: break-word; }
+        .item-detail { display: flex; justify-content: space-between; font-size: 12px; color: #555; margin-bottom: 10px; padding-left: 10px; gap: 8px;}
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .payment-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px dashed #999;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .payment-section h3 { margin: 0 0 10px 0; font-size: 14px; }
+        .bank-account { font-size: 16px; font-weight: bold; margin: 5px 0; letter-spacing: 1px; }
+        
+        .btn-wa {
+            display: block;
+            background-color: #25D366;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+        
+        .footer { text-align: center; margin-top: 25px; font-size: 11px; color: #888; }
+
+        /* ============================================ */
+        /* STYLING STATUS LUNAS                          */
+        /* ============================================ */
+        .paid-banner {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            text-align: center;
+            padding: 12px;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 5px rgba(46, 204, 113, 0.4);
+        }
+        
+        .paid-stamp {
+            position: absolute;
+            top: 42%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-22deg);
+            border: 5px solid #2ecc71;
+            color: #2ecc71;
+            font-size: 52px;
+            font-weight: 900;
+            padding: 5px 30px;
+            border-radius: 12px;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 10;
+            font-family: Arial, sans-serif;
+            letter-spacing: 6px;
+            user-select: none;
+            white-space: nowrap;
+        }
+        
+        .paid-info-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #eafaf1;
+            border: 2px dashed #2ecc71;
+            border-radius: 5px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .paid-info-box h3 { 
+            margin: 0 0 8px 0; 
+            font-size: 15px; 
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paid-info-box p { 
+            margin: 4px 0; 
+            font-size: 12px; 
+            color: #555;
+        }
+        .paid-checkmark {
+            font-size: 40px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="invoice-container">
+        <!-- ============================================ -->
+        <!-- BANNER LUNAS (hanya muncul jika status=lunas) -->
+        <!-- ============================================ -->
+        <div id="paid-banner" class="paid-banner" style="display:none;">✅ PEMBAYARAN DITERIMA — LUNAS</div>
+
+        <!-- HEADER TOKO -->
+        <div class="header">
+            <img src="logo.png" alt="Logo 45 Degrees Coffee" class="store-logo">            
+            <h2>45 degrees coffee</h2>
+            <p>Jl. Budi No 124D Pasirkaliki</p>
+            <p>WhatsApp: 0813-2146-9693</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- INFO INVOICE -->
+        <div class="info-row">
+            <span><strong>Invoice No:</strong> <span id="inv-number">-</span></span>
+            <span><strong>Tgl:</strong> <span id="inv-date">-</span></span>
+        </div>
+        <div class="info-row">
+            <span><strong>Kepada:</strong> <span id="cust-name">-</span></span>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- DAFTAR PESANAN -->
+        <div id="items-container"></div>
+
+        <div class="divider"></div>
+
+        <!-- TOTAL -->
+        <div class="total-row">
+            <span id="total-label">Total Tagihan</span>
+            <span id="grand-total">Rp 0</span>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SECTION BELUM BAYAR (default)                -->
+        <!-- ============================================ -->
+        <div id="payment-section" class="payment-section">
+            <h3>Silakan Transfer Ke:</h3>
+            <p style="margin: 0; font-size: 13px;">Bank BCA</p>
+            <div class="bank-account">139-237-4081</div>
+            <p style="margin: 0; font-size: 12px;">a.n. Dendy Ridwan Juhari</p>
+            
+            <p style="margin: 10px 0 5px 0; font-size: 12px; font-weight: bold;">ATAU SCAN QRIS:</p>
+            <img src="QRIS45.png" alt="QRIS" style="width: 150px; height: 150px; border-radius: 5px;">
+            
+            <a href="#" id="btn-wa" class="btn-wa" target="_blank">Konfirmasi Pembayaran via WA</a>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SECTION SUDAH LUNAS                           -->
+        <!-- ============================================ -->
+        <div id="paid-section" class="paid-info-box" style="display:none;">
+            <div class="paid-checkmark">✅</div>
+            <h3>Pembayaran Telah Diterima</h3>
+            <p>Terima kasih atas pembayaran Anda.</p>
+            <p>Pesanan akan segera kami proses.</p>
+            <p style="margin-top: 10px; font-size: 11px; color: #999;">Bukti pembayaran resmi ini dapat Anda simpan.</p>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>Link Kritik dan Saran: chat No Whatsapp di atas</p>
+            <p>Terima kasih atas kepercayaan Anda.</p>
+        </div>
+    </div>
+
+    <!-- SCRIPT -->
+    <script>
+        // ============================================
+        // KONFIGURASI
+        // ============================================
+        const waTokoDefault = '6281321469693';
+
+        // ============================================
+        // HELPER: Format Rupiah
+        // ============================================
+        function formatRupiah(angka) {
+            return new Intl.NumberFormat('id-ID', { 
+                style: 'currency', 
+                currency: 'IDR', 
+                minimumFractionDigits: 0 
+            }).format(angka);
+        }
+
+        // ============================================
+        // HELPER: Ekstrak tanggal dari nomor invoice
+        // Format: INV-XXX-DDMMYYYY → DD MMM YYYY
+        // ============================================
+        function parseDateFromInvoice(invNumber) {
+            try {
+                const parts = invNumber.split('-');
+                if (parts.length >= 3) {
+                    const dateStr = parts[2];
+                    if (dateStr.length === 8 && /^\d+$/.test(dateStr)) {
+                        const dd = dateStr.substring(0, 2);
+                        const mm = dateStr.substring(2, 4);
+                        const yyyy = dateStr.substring(4, 8);
+                        
+                        const namaBulan = [
+                            'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+                            'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
+                        ];
+                        
+                        const bulanIdx = parseInt(mm) - 1;
+                        if (bulanIdx >= 0 && bulanIdx < 12) {
+                            return `${parseInt(dd)} ${namaBulan[bulanIdx]} ${yyyy}`;
+                        }
+                    }
+                }
+            } catch(e) {
+                console.warn('Gagal parse tanggal dari invoice:', e);
+            }
+            return new Date().toLocaleDateString('id-ID', { 
+                day: 'numeric', month: 'short', year: 'numeric' 
+            });
+        }
+
+        // ============================================
+        // BACA PARAMETER URL
+        // ============================================
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        const customerName = urlParams.get('cust') || 'Pelanggan Umum';
+        const invoiceNumber = urlParams.get('inv') || 'INV-XXX';
+        const status = urlParams.get('status');
+        const waNumber = urlParams.get('wa') || waTokoDefault;
+        const invoiceDate = urlParams.get('tgl') || parseDateFromInvoice(invoiceNumber);
+
+        // ============================================
+        // BACA ITEM DARI URL
+        // ============================================
+        let itemsHTML = '';
+        let grandTotal = 0;
+        let itemIndex = 1;
+
+        while (urlParams.has(`item${itemIndex}_name`)) {
+            const name = urlParams.get(`item${itemIndex}_name`);
+            const qty = parseFloat(urlParams.get(`item${itemIndex}_qty`)) || 1;
+            const price = parseFloat(urlParams.get(`item${itemIndex}_price`)) || 0;
+            const subtotal = qty * price;
+            
+            grandTotal += subtotal;
+
+            itemsHTML += `
+                <div class="item-row">
+                    <span class="item-name">${name}</span>
+                </div>
+                <div class="item-detail">
+                    <span>${qty} x ${formatRupiah(price)}</span>
+                    <span>${formatRupiah(subtotal)}</span>
+                </div>
+            `;
+            
+            itemIndex++;
+        }
+
+        if (itemsHTML === '') {
+            itemsHTML = `<p style="text-align:center; font-size:12px; color:red;">Data pesanan tidak ditemukan di URL.</p>`;
+        }
+
+        // ============================================
+        // RENDER DATA KE HTML
+        // ============================================
+        document.getElementById('cust-name').innerText = customerName;
+        document.getElementById('inv-number').innerText = invoiceNumber;
+        document.getElementById('inv-date').innerText = invoiceDate;
+        document.getElementById('items-container').innerHTML = itemsHTML;
+        document.getElementById('grand-total').innerText = formatRupiah(grandTotal);
+
+        // ============================================
+        // CEK STATUS LUNAS
+        // ============================================
+        if (status === 'lunas') {
+            document.getElementById('paid-banner').style.display = 'block';
+            document.getElementById('payment-section').style.display = 'none';
+            document.getElementById('paid-section').style.display = 'block';
+            document.getElementById('total-label').innerText = 'Total Dibayar';
+            
+            const container = document.querySelector('.invoice-container');
+            const stamp = document.createElement('div');
+            stamp.className = 'paid-stamp';
+            stamp.innerText = 'LUNAS';
+            container.appendChild(stamp);
+            
+            document.title = `✅ LUNAS - ${invoiceNumber} - 45 Degrees Coffee`;
+        } else {
+            const waText = encodeURIComponent(
+                `Halo Admin 45 Degrees Coffee, saya ${customerName} sudah transfer untuk Invoice ${invoiceNumber} sebesar ${formatRupiah(grandTotal)}. Mohon dicek ya. Terima kasih.`
+            );
+            document.getElementById('btn-wa').href = `https://wa.me/${waNumber}?text=${waText}`;
+            
+            document.title = `📋 ${invoiceNumber} - ${customerName} - 45 Degrees Coffee`;
+        }
+    </script>
+</body>
+</html>
